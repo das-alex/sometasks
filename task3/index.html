@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task3</title>
+</head>
+<body>
+    <script>
+        const http = (function() {
+            function http() {
+                this.xhr = new XMLHttpRequest();
+            }
+
+            function handleResponse(xhr) {
+                return new Promise(function(res) {
+                    xhr.addEventListener('load', function(event) {
+                        const {status, responseURL} = event.target;
+                        res({
+                            status,
+                            responseURL
+                        });
+                    });
+                });
+            }
+
+            function setHeaders(xhr) {
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            }
+
+            http.prototype.get = function(endPoint) {
+                this.xhr.open('GET', endPoint, true);
+                
+                setHeaders(this.xhr);
+
+                this.xhr.send();
+                return handleResponse(this.xhr);
+            }
+
+            return http;
+        })();
+
+        const req1 = new http().get('https://cors-anywhere.herokuapp.com/http://google.com');
+        const req2 = new http().get('https://cors-anywhere.herokuapp.com/http://yandex.by');
+
+        Promise.all([req1, req2]).then(data => {
+            console.log('Both query are completed', data);
+        });
+
+    </script>
+</body>
+</html>

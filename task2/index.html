@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task2</title>
+</head>
+<body>
+    <style>
+        .form_row {
+            padding: 10px;
+            margin-bottom: 12px;
+            outline: 1px solid #cacaca;
+        }
+    </style>
+    <form id="thatForm" action="">
+        <div class="form_row">
+          <input name="size" id="size_s" type="radio">
+          <label for="size_s">Size S</label>
+          <input name="size" id="size_m" type="radio">
+          <label for="size_m">Size M</label>
+          <input name="size" id="size_l" type="radio">
+          <label for="size_l">Size L</label>
+        </div>
+        <div class="form_row">
+          <input name="color_1" id="color_1" type="checkbox">
+          <label for="color_1">Color 1</label>
+          <input name="color_2" id="color_2" type="checkbox">
+          <label for="color_2">Color 2</label>
+          <input name="color_3" id="color_3" type="checkbox">
+          <label for="color_3">Color 3</label>
+          <input name="color_4" id="color_4" type="checkbox">
+          <label for="color_4">Color 4</label>
+          <input name="color_5" id="color_5" type="checkbox">
+          <label for="color_5">Color 5</label>
+        </div>
+        <div class="form_row">
+          <select multiple name="manufacturer" id="manufacturer">
+            <option id="manufacturer_aaa" value="aaa">aaa</option>
+            <option id="manufacturer_b%26c" value="b&c">b&c</option>
+            <option id="manufacturer_ddd" value="ddd">ddd</option>
+            <option id="manufacturer_eee" value="eee">eee</option>
+          </select>
+        </div>
+        <div class="form_row">
+          <input notdisturb="true" name="sale" id="sale" type="checkbox">
+          <label for="sale">Sale</label>
+        </div>
+        <button id="sendBtn">Send</button>
+      </form>
+      <script>
+          // index.html?size=M&color=1&color=2&manufacturer=aaa&manufacturer=ddd
+        const form = document.getElementById('thatForm');
+
+        function getParams(search) {
+            const params = {};
+            let filter = search.slice(1).split('&');
+            filter.map(item => item.split('=')).forEach(param => {
+                params.hasOwnProperty(param[0])
+                    ? params[param[0]].push(param[1])
+                    : params[param[0]] = [param[1]];
+            });
+            return params;
+        }
+
+        function setForm(params, form) {
+            const keys = Object.keys(params);
+            keys.forEach(key => {
+                params[key].forEach(item => {
+                    const id = key+'_'+item.toLowerCase();
+                    const field = form[id] || form[key];
+                    const type = field.type;
+                    setByType(type, field, id);
+                });
+            });
+
+            function setByType(type, field, id) {
+                switch (type) {
+                    case 'radio':
+                    case 'checkbox': {
+                        field.checked = true;
+                        break;
+                    }
+                    case 'select-multiple': {
+                        field.options[id].selected = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        form.addEventListener('change', (event) => {
+            console.log(getForm(form.elements).join('&'));
+        });
+
+        function getForm(form) {
+            const result = [];
+            Object.keys(form).forEach(item => {
+                if (form[item].getAttribute('notdisturb') || form[item].type === 'submit') {
+                    return;
+                }
+                result.push(getByType(form[item]));
+            });
+            
+            function getByType(item) {
+                switch (item.type) {
+                    case 'radio':
+                    case 'checkbox': {
+                        return item.checked ? item.id.replace(/_/i, '=') : null;
+                    }
+                    case 'select-multiple': {
+                        return Object.keys(item.selectedOptions).map(opt => {
+                            return item.selectedOptions[opt].id.replace(/_/i, '=');
+                        });
+                    }
+                }
+            }
+
+            return result.flat().filter(el => el != null);
+        }
+
+        setForm(getParams(location.search), form.elements);
+      </script>
+</body>
+</html>

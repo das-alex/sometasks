@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 4</title>
+</head>
+<body>
+    <h1>Domain two</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias, quos.</p>
+    <script>
+        window.onmessage = function(e) {
+            const payload = e.data !== '' && JSON.parse(e.data);
+            if (payload) {
+                callSwitch(payload);
+            }
+        }
+
+        function callSwitch(payload) {
+            const message = new getMessages(payload);
+            switch (payload.method) {
+                case 'set': {
+                    message.setItem();
+                    break;
+                }
+                case 'get': {
+                    message.getItem();
+                    break;
+                }
+                case 'remove': {
+                    message.removeItem();
+                    break;
+                }
+            }
+        }
+
+        const getMessages = (function() {
+            function getMessages(event) {
+                this.payload = event;
+            }
+
+            function callbackIt() {
+                if (this.payload.hasOwnProperty('callback') && this.payload.callback !== undefined) {
+                    eval(`(${decodeURI(this.payload.callback)})();`);
+                }
+            }
+
+            getMessages.prototype.setItem = function() {
+                localStorage.setItem(this.payload.key, this.payload.value);
+                console.log('written');
+                callbackIt.call(this);
+            }
+
+            getMessages.prototype.getItem = function() {
+                console.log(localStorage.getItem(this.payload.key));
+                callbackIt.call(this);
+            }
+
+            getMessages.prototype.removeItem = function() {
+                localStorage.removeItem(this.payload.key);
+                console.log('deleted');
+                callbackIt.call(this);
+            }
+
+            return getMessages;
+        })();
+
+        
+    </script>
+</body>
+</html>

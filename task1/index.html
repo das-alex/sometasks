@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task2</title>
+</head>
+<body>
+    <style>.red {color: red;}</style>
+    <input type="text" name="name" id="name_input" value="Xxxx">
+    <script>
+        document.getElementById('name_input').addEventListener('input', (event) => {
+        const defaultValue = event.target.getAttribute('value')
+        if (event.target.value === defaultValue) {
+          event.target.classList.remove('red');
+          return;
+        }
+        event.target.classList.add('red');
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 4</title>
+</head>
+<body>
+    <style>
+        iframe {
+            outline: 1px solid;
+        }
+    </style>
+    <h1>Domain one</h1>
+    <iframe src="http://localhost:8001" style="visibility: hidden;"></iframe>
+    <script>
+        const frame = (function() {
+            function frame(frame) {
+                this.remote = window.frames[frame];
+            }
+
+            frame.prototype.get = function(key, callback) {
+                this.remote.postMessage(JSON.stringify({
+                    key,
+                    method: 'get',
+                    callback: callback ? encodeURI(callback.toString()) : undefined
+                }), '*');
+            }
+
+            frame.prototype.set = function(key, value, callback) {
+                this.remote.postMessage(JSON.stringify({key, value, method: 'set'}), '*');
+            }
+
+            frame.prototype.remove = function(key, callback) {
+                this.remote.postMessage(JSON.stringify({key, method: 'remove'}), '*');
+            }
+
+            return frame;
+        })();
+
+        const frameInst = new frame(0);
+        frameInst.set('newKey', 'lorem ipsum');
+        frameInst.set('newKey2', 'lorem ipsum 2');
+        frameInst.get('test', function hello() {alert('hello from callback')});
+        frameInst.get('newKey');
+        frameInst.get('newKey2');
+        frameInst.remove('newKey2');
+
+    </script>
+</body>
+</html>
